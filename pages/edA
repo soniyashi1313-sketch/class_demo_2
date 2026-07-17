@@ -1,0 +1,141 @@
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+st.set_page_config(
+    page_title="Cars Dataset Analysis",
+    page_icon="🚗",
+    layout="wide"
+)
+
+
+st.title("🚗 Cars Dataset Analysis Dashboard")
+st.markdown("### Exploratory Data Analysis (EDA)")
+
+
+df = pd.read_csv("Cars_cleaned.csv")
+
+
+st.sidebar.title("Dashboard Menu")
+option = st.sidebar.radio(
+    "Select Option",
+    [
+        "Dataset",
+        "Data Info",
+        "Missing Values",
+        "Statistics",
+        "Histogram",
+        "Bar Chart",
+        "Correlation",
+        "Scatter Plot"
+    ]
+)
+
+
+if option == "Dataset":
+    st.subheader("Dataset Preview")
+    st.dataframe(df)
+
+    st.write("Rows :", df.shape[0])
+    st.write("Columns :", df.shape[1])
+
+elif option == "Data Info":
+
+    st.subheader("Column Names")
+    st.write(df.columns)
+
+    st.subheader("Data Types")
+    st.write(df.dtypes)
+
+elif option == "Missing Values":
+
+    st.subheader("Missing Values")
+    st.write(df.isnull().sum())
+
+
+elif option == "Statistics":
+
+    st.subheader("Statistical Summary")
+    st.write(df.describe())
+
+
+elif option == "Histogram":
+
+    st.subheader("Histogram")
+
+    numeric_columns = df.select_dtypes(include=['number']).columns
+
+    column = st.selectbox("Select Numeric Column", numeric_columns)
+
+    fig, ax = plt.subplots()
+
+    ax.hist(df[column], bins=20)
+
+    ax.set_xlabel(column)
+
+    ax.set_ylabel("Frequency")
+
+    ax.set_title(column)
+
+    st.pyplot(fig)
+
+
+elif option == "Bar Chart":
+
+    st.subheader("Bar Chart")
+
+    categorical_columns = df.select_dtypes(include='object').columns
+
+    column = st.selectbox("Select Category", categorical_columns)
+
+    st.bar_chart(df[column].value_counts())
+
+
+elif option == "Correlation":
+
+    st.subheader("Correlation Matrix")
+
+    corr = df.select_dtypes(include='number').corr()
+
+    fig, ax = plt.subplots(figsize=(8,6))
+
+    c = ax.imshow(corr, cmap='coolwarm')
+
+    plt.colorbar(c)
+
+    ax.set_xticks(range(len(corr.columns)))
+
+    ax.set_xticklabels(corr.columns, rotation=90)
+
+    ax.set_yticks(range(len(corr.columns)))
+
+    ax.set_yticklabels(corr.columns)
+
+    st.pyplot(fig)
+
+
+elif option == "Scatter Plot":
+
+    st.subheader("Scatter Plot")
+
+    numeric_columns = df.select_dtypes(include=['number']).columns
+
+    x = st.selectbox("X Axis", numeric_columns)
+
+    y = st.selectbox("Y Axis", numeric_columns, index=1)
+
+    fig, ax = plt.subplots()
+
+    ax.scatter(df[x], df[y])
+
+    ax.set_xlabel(x)
+
+    ax.set_ylabel(y)
+
+    ax.set_title(f"{x} vs {y}")
+
+    st.pyplot(fig)
+
+st.markdown("---")
+st.markdown("Developed using Python, Pandas, Matplotlib and Streamlit")
